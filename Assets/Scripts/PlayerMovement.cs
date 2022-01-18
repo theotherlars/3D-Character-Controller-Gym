@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,31 +9,61 @@ public class PlayerMovement : MonoBehaviour {
     [Header("Input Stuff:")]
     [SerializeField]KeyCode runKey;
     [SerializeField]KeyCode jumpKey;
+    [SerializeField]KeyCode crouchKey;
+
     
     [Header("Movement Stuff:")]
     [SerializeField]private float movementSpeed;
     [SerializeField]private float runSpeed;
-    [SerializeField]float jumpForce;
+    [SerializeField]private float crouchSpeed;
 
-    [Header("Gravity")]
-    [SerializeField]float gravity;
+    [Header("Jump Stuff:")]
+    [SerializeField]float jumpHeight;
+
+    
+    [Header("Double Jump Stuff:")]
+    [SerializeField]private bool allowDoubleJump;
+    // [SerializeField]float doubleJumpTime;
+    [SerializeField]int allowedExtraJumps;
+    [SerializeField]private bool onlyAllowOnDecline; 
+
+
+    [Header("Crouch Stuff:")]
+    [SerializeField]float crouchMultiplier;
+    [SerializeField]float deCrouchMultiplier;
+    public bool isCrouching;
+
+    [Header("Gravity stuff:")]
+    [SerializeField]float gravityScale;
+    public Vector3 velocity;
 
     [Header("Ground Check Stuff:")]
     [SerializeField]Transform groundCheck;
-    [SerializeField]float checkDistance;
-    [SerializeField]LayerMask whatIsFloor;
+    [SerializeField]float groundCheckRadius;
+    [SerializeField]LayerMask whatIsGround;
+    public bool isGrounded;
+
+    [Header("Roof Check Stuff:")]
+    [SerializeField]LayerMask whatIsRoof;
+    [SerializeField]float roofCheckRadius;
+    [SerializeField]Transform roofCheck;
+    public bool isRoofAbove;
     
     CharacterController cc;
     Vector3 movementDirection;
-    
+    const float gravityConst = -9.81f;
+    int currentJumpCount;
+
     void Start(){
         cc = GetComponent<CharacterController>();
+        currentJumpCount = 0;
     }
 
     void Update(){
-        HandleInput();
+        isGrounded = IsGrounded();
+        isRoofAbove = IsRoofAbove();
         HandleGravity();
-        print(IsGrounded());
+        HandleInput();
     }
 
     void HandleInput(){
@@ -40,42 +71,104 @@ public class PlayerMovement : MonoBehaviour {
         float z = Input.GetAxis("Vertical");
         movementDirection = (transform.right * x) + (transform.forward * z);
         
-        if(Input.GetKeyDown(jumpKey)){
-            Jump();
-        }
+        cc.Move(velocity * Time.deltaTime); // Jump movement
+         
         
-        if(Input.GetKey(runKey)){
+        if(allowDoubleJump){
+            if(Input.GetKeyDown(jumpKey) && isGrounded || Input.GetKeyDown(jumpKey) && currentJumpCount < allowedExtraJumps){
+                if(!onlyAllowOnDecline){
+                    Jump();
+                }
+                else if(onlyAllowOnDecline && cc.velocity.y < 0.0f){
+                    Jump();
+                }
+                else{
+                    Jump();
+                }
+            }
+        }
+        else{
+            if(Input.GetKeyDown(jumpKey) && isGrounded){
+                Jump();
+            }
+        }
+
+        if(Input.GetKey(crouchKey)){    
+            CrouchMove();
+        }
+        else if(Input.GetKey(runKey)){
             Run();
         }
         else{
             Move();
         }
 
+        if(Input.GetKeyDown(crouchKey)){
+            Crouch();
+        }
+        if(Input.GetKeyUp(crouchKey)){
+            UnCrouch();
+        }
     }
+
     void Move(){
-        cc.Move(movementDirection * movementSpeed * Time.deltaTime);
+        Movement(movementSpeed);
+        // Walking Animations
     }
+
     void Run(){
-        cc.Move(movementDirection * runSpeed * Time.deltaTime);
+        Movement(runSpeed);
+        // Run Animations
     }
+
+    void CrouchMove(){
+        Movement(crouchSpeed);
+    }
+
+    void Movement(float speed){
+        cc.Move(movementDirection * speed * Time.deltaTime);
+    }
+
+    void Crouch(){
+        isCrouching = true;
+        cc.height *= crouchMultiplier;
+        Vector3 camPos = Camera.main.transform.localPosition;
+        Camera.main.transform.localPosition -= new Vector3(camPos.x, camPos.y * crouchMultiplier,camPos.z);
+    }
+
+    void UnCrouch(){
+        isCrouching = false;
+        cc.height *= deCrouchMultiplier;
+        Vector3 camPos = Camera.main.transform.localPosition;
+        Camera.main.transform.localPosition = new Vector3(camPos.x,camPos.y * deCrouchMultiplier,camPos.z);
+    }
+
     void Jump(){
-        if(!IsGrounded()){return;}
-        print("tried to jump");
-        movementDirection.y = jumpForce;
+        currentJumpCount += 1;
+        velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
     }
+
     bool IsGrounded(){
         bool val = false;
-        bool hit = Physics.Raycast(groundCheck.position,Vector3.down,checkDistance,whatIsFloor.value);
-        if(hit){
-            val = true;
-        }
+        val = Physics.CheckSphere(groundCheck.position,groundCheckRadius,whatIsGround);
+        if(val){currentJumpCount = 0;}
         return val;
+    }
+    bool IsRoofAbove(){
+        return Physics.CheckSphere(roofCheck.position,roofCheckRadius,whatIsRoof);
     }
 
     void HandleGravity(){
-        if(IsGrounded()){
-            movementDirection.y = 0f;
+        if(isGrounded && velocity.y < 0.0f){
+            velocity.y = -2;
         }
-        movementDirection.y -= gravity * Time.deltaTime;
+        else{
+            velocity.y += gravityConst * gravityScale * Time.deltaTime;
+        }
+    }
+
+    private void OnDrawGizmosSelected() {
+        if(groundCheck){Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);}
+        if(roofCheck){Gizmos.DrawSphere(roofCheck.position, roofCheckRadius);}
     }
 }
