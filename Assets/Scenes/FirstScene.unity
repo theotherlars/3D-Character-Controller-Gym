@@ -32524,9 +32524,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runKey: 304
   jumpKey: 32
-  crouchKey: 306
+  crouchKey: 99
   movementSpeed: 5
-  runSpeed: 7
+  runSpeed: 10
   crouchSpeed: 2.5
   jumpHeight: 2
   enableCoyoteJump: 1
@@ -32538,7 +32538,7 @@ MonoBehaviour:
   crouchMultiplier: 0.5
   deCrouchMultiplier: 2
   isCrouching: 0
-  gravityScale: 1
+  gravityScale: 3
   velocity: {x: 0, y: 0, z: 0}
   groundCheck: {fileID: 2037068923}
   groundCheckRadius: 0.1
@@ -32549,7 +32549,7 @@ MonoBehaviour:
   whatIsRoof:
     serializedVersion: 2
     m_Bits: 1
-  roofCheckRadius: 0.2
+  roofCheckRadius: 1.5
   roofCheck: {fileID: 1844635179}
   isRoofAbove: 0
 --- !u!114 &1170413685
@@ -37776,6 +37776,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 756626688}
+    - target: {fileID: 2103122113072466439, guid: 9ae5439ef0632fb41886958b56ec312e, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2103122113365037272, guid: 9ae5439ef0632fb41886958b56ec312e, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2118400835366713870, guid: 9ae5439ef0632fb41886958b56ec312e, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -69366,7 +69374,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1844635178}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 64735755}
@@ -71518,7 +71526,7 @@ GameObject:
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
-  m_Icon: {fileID: 2800000, guid: 33945f703736c47498502b3fdb360955, type: 3}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

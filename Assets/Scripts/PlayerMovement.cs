@@ -3,15 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour {
-    
     
     [Header("Input Stuff:")]
     [SerializeField]KeyCode runKey;
     [SerializeField]KeyCode jumpKey;
     [SerializeField]KeyCode crouchKey;
 
-    
     [Header("Movement Stuff:")]
     [SerializeField]private float movementSpeed;
     [SerializeField]private float runSpeed;
@@ -22,13 +21,11 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]bool enableCoyoteJump;
     [SerializeField]float coyoteJumpTime;
     [SerializeField]float coyoteJumpMultiplier;
-
     
     [Header("Double Jump Stuff:")]
     [SerializeField]private bool allowDoubleJump;
     [SerializeField]int allowedExtraJumps;
     [SerializeField]private bool onlyAllowOnDecline; 
-
 
     [Header("Crouch Stuff:")]
     [SerializeField]float crouchMultiplier;
@@ -75,12 +72,15 @@ public class PlayerMovement : MonoBehaviour {
     void HandleInput(){
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-        movementDirection = (transform.right * x) + (transform.forward * z);
+        
         
         // JUMPING
         HandleJump();
 
-        if(Input.GetKey(crouchKey)){    
+        // MOVEMENT
+        movementDirection = (transform.right * x) + (transform.forward * z);
+
+        if(Input.GetKey(crouchKey) || isCrouching){    
             CrouchMove();
         }
         else if(Input.GetKey(runKey)){
@@ -90,10 +90,13 @@ public class PlayerMovement : MonoBehaviour {
             Move();
         }
 
-        if(Input.GetKeyDown(crouchKey)){
+        if(Input.GetKeyDown(crouchKey) && !isCrouching){
             Crouch();
         }
-        if(Input.GetKeyUp(crouchKey)){
+        if(Input.GetKeyUp(crouchKey) && !IsRoofAbove()){
+            UnCrouch();
+        }
+        if(isCrouching && !Input.GetKey(crouchKey) && !IsRoofAbove()){
             UnCrouch();
         }
     }
@@ -114,7 +117,7 @@ public class PlayerMovement : MonoBehaviour {
 
         if(enableCoyoteJump){
             if(Input.GetKeyUp(jumpKey) && velocity.y > 0.0f){ // releasing jumpkey while on the way up, greater gravity down
-                velocity.y *= coyoteJumpMultiplier * gravityScale;
+                velocity.y *= coyoteJumpMultiplier;
                 coyoteJumpTimeCounter = 0f;
             }
         }
@@ -149,14 +152,24 @@ public class PlayerMovement : MonoBehaviour {
 
     void Crouch(){
         isCrouching = true;
+        
         cc.height *= crouchMultiplier;
+        
+        Vector3 roofCheckPos = roofCheck.localPosition;
+        roofCheck.localPosition -= new Vector3(roofCheckPos.x, roofCheckPos.y * crouchMultiplier, roofCheckPos.z);
+
         Vector3 camPos = Camera.main.transform.localPosition;
         Camera.main.transform.localPosition -= new Vector3(camPos.x, camPos.y * crouchMultiplier,camPos.z);
     }
 
     void UnCrouch(){
         isCrouching = false;
+        
         cc.height *= deCrouchMultiplier;
+        
+        Vector3 roofCheckPos = roofCheck.localPosition;
+        roofCheck.localPosition -= new Vector3(roofCheckPos.x, roofCheckPos.y * deCrouchMultiplier, roofCheckPos.z);
+
         Vector3 camPos = Camera.main.transform.localPosition;
         Camera.main.transform.localPosition = new Vector3(camPos.x,camPos.y * deCrouchMultiplier,camPos.z);
     }
@@ -173,7 +186,15 @@ public class PlayerMovement : MonoBehaviour {
         return val;
     }
     bool IsRoofAbove(){
-        return Physics.CheckSphere(roofCheck.position,roofCheckRadius,whatIsRoof);
+        bool val = false;
+        Vector3 endPos = roofCheck.position;
+        endPos.y += roofCheckRadius;
+        if(Physics.Linecast(roofCheck.position,endPos,out RaycastHit hit, whatIsRoof)){
+            val = true;
+        }
+        return val;
+        // Physics.Raycast(roofCheck.position,Vector3.up,roofCheckRadius,whatIsRoof);
+        // return Physics.CheckSphere(roofCheck.position,roofCheckRadius,whatIsRoof);
     }
 
     void HandleGravity(){
@@ -187,6 +208,6 @@ public class PlayerMovement : MonoBehaviour {
 
     private void OnDrawGizmosSelected() {
         if(groundCheck){Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);}
-        if(roofCheck){Gizmos.DrawSphere(roofCheck.position, roofCheckRadius);}
+        // if(roofCheck){Gizmos.DrawRay(roofCheck.position,Vector3.up);}
     }
 }
