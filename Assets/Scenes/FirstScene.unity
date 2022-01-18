@@ -32529,8 +32529,11 @@ MonoBehaviour:
   runSpeed: 7
   crouchSpeed: 2.5
   jumpHeight: 2
+  enableCoyoteJump: 1
+  coyoteJumpTime: 0.4
+  coyoteJumpMultiplier: 0.6
   allowDoubleJump: 1
-  allowedExtraJumps: 3
+  allowedExtraJumps: 1
   onlyAllowOnDecline: 1
   crouchMultiplier: 0.5
   deCrouchMultiplier: 2
