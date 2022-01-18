@@ -48,11 +48,21 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]Transform roofCheck;
     public bool isRoofAbove;
 
+    [Header("Climbing Stuff:")]
+    [SerializeField]LayerMask whatIsClimbable;
+    [SerializeField]float climbableCheckRadius;
+    [SerializeField]Transform climbableCheck;
+    public bool isFacingClimbableWall;
+    public bool isClimbing;
+
     // PRIVATES    
     CharacterController cc;
     Vector3 movementDirection;
     int currentJumpCount;
     float coyoteJumpTimeCounter;
+    float inputX;
+    float inputY;
+    float gravityStore;
 
     // CONSTANTS
     const float gravityConst = -9.81f;
@@ -60,43 +70,81 @@ public class PlayerMovement : MonoBehaviour {
     void Start(){
         cc = GetComponent<CharacterController>();
         currentJumpCount = 0;
+        gravityStore = gravityScale;
     }
 
     void Update(){
         isGrounded = IsGrounded();
         isRoofAbove = IsRoofAbove();
+        isFacingClimbableWall = IsFacingClimbableWall();
         HandleGravity();
         HandleInput();
     }
 
     void HandleInput(){
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        
-        
-        // JUMPING
-        HandleJump();
+        // INPUT
+        inputX = Input.GetAxis("Horizontal");
+        inputY = Input.GetAxis("Vertical");
 
-        // MOVEMENT
-        movementDirection = (transform.right * x) + (transform.forward * z);
-
-        if(Input.GetKey(crouchKey) || isCrouching){    
-            CrouchMove();
+        if(Input.GetKeyDown(jumpKey) && isFacingClimbableWall){
+            isClimbing = true;
+            gravityScale = 0f;
         }
-        else if(Input.GetKey(runKey)){
-            Run();
+
+        if(!isFacingClimbableWall){
+            isClimbing = false;
+        }
+
+        if(!isClimbing){
+            // MOVEMENT
+            movementDirection = (transform.right * inputX) + (transform.forward * inputY);
+            HandleMovement();
+
+            // JUMPING
+            HandleJump();
+            gravityScale = gravityStore;
         }
         else{
+            Climb();
+        }
+    }
+
+    
+
+    void HandleGravity(){
+        if(isGrounded && velocity.y < 0.0f){
+            velocity.y = -2;
+        }
+        else{
+            velocity.y += gravityConst * gravityScale * Time.deltaTime;
+        }
+    }
+
+    void HandleMovement()
+    {
+        if (Input.GetKey(crouchKey) || isCrouching)
+        {
+            CrouchMove();
+        }
+        else if (Input.GetKey(runKey))
+        {
+            Run();
+        }
+        else
+        {
             Move();
         }
 
-        if(Input.GetKeyDown(crouchKey) && !isCrouching){
+        if (Input.GetKeyDown(crouchKey) && !isCrouching)
+        {
             Crouch();
         }
-        if(Input.GetKeyUp(crouchKey) && !IsRoofAbove()){
+        if (Input.GetKeyUp(crouchKey) && !IsRoofAbove())
+        {
             UnCrouch();
         }
-        if(isCrouching && !Input.GetKey(crouchKey) && !IsRoofAbove()){
+        if (isCrouching && !Input.GetKey(crouchKey) && !IsRoofAbove())
+        {
             UnCrouch();
         }
     }
@@ -134,6 +182,10 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
+    void Movement(float speed){
+        cc.Move(movementDirection * speed * Time.deltaTime);
+    }
+    
     void Move(){
         Movement(movementSpeed);
     }
@@ -142,12 +194,22 @@ public class PlayerMovement : MonoBehaviour {
         Movement(runSpeed);
     }
 
+    void Jump(){
+        currentJumpCount += 1;
+        velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
+    }
+    
+    void Climb(){
+        isClimbing = true;
+        
+
+        if(Input.GetKey(jumpKey)){
+            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
+        }
+    }
+    
     void CrouchMove(){
         Movement(crouchSpeed);
-    }
-
-    void Movement(float speed){
-        cc.Move(movementDirection * speed * Time.deltaTime);
     }
 
     void Crouch(){
@@ -174,17 +236,13 @@ public class PlayerMovement : MonoBehaviour {
         Camera.main.transform.localPosition = new Vector3(camPos.x,camPos.y * deCrouchMultiplier,camPos.z);
     }
 
-    void Jump(){
-        currentJumpCount += 1;
-        velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
-    }
-
     bool IsGrounded(){
         bool val = false;
         val = Physics.CheckSphere(groundCheck.position,groundCheckRadius,whatIsGround);
         if(val){currentJumpCount = 0;}
         return val;
     }
+    
     bool IsRoofAbove(){
         bool val = false;
         Vector3 endPos = roofCheck.position;
@@ -196,18 +254,16 @@ public class PlayerMovement : MonoBehaviour {
         // Physics.Raycast(roofCheck.position,Vector3.up,roofCheckRadius,whatIsRoof);
         // return Physics.CheckSphere(roofCheck.position,roofCheckRadius,whatIsRoof);
     }
-
-    void HandleGravity(){
-        if(isGrounded && velocity.y < 0.0f){
-            velocity.y = -2;
-        }
-        else{
-            velocity.y += gravityConst * gravityScale * Time.deltaTime;
-        }
+    
+    bool IsFacingClimbableWall(){
+        bool val = false;
+        val = Physics.CheckSphere(climbableCheck.position,climbableCheckRadius,whatIsClimbable);
+        return val;
     }
-
-    private void OnDrawGizmosSelected() {
-        if(groundCheck){Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);}
+    
+    private void OnDrawGizmosSelected(){
+        if(groundCheck){Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);}
+        if(climbableCheck){Gizmos.DrawWireSphere(climbableCheck.position,climbableCheckRadius);}
         // if(roofCheck){Gizmos.DrawRay(roofCheck.position,Vector3.up);}
     }
 }
