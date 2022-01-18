@@ -19,11 +19,13 @@ public class PlayerMovement : MonoBehaviour {
 
     [Header("Jump Stuff:")]
     [SerializeField]float jumpHeight;
+    [SerializeField]bool enableCoyoteJump;
+    [SerializeField]float coyoteJumpTime;
+    [SerializeField]float coyoteJumpMultiplier;
 
     
     [Header("Double Jump Stuff:")]
     [SerializeField]private bool allowDoubleJump;
-    // [SerializeField]float doubleJumpTime;
     [SerializeField]int allowedExtraJumps;
     [SerializeField]private bool onlyAllowOnDecline; 
 
@@ -48,11 +50,15 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]float roofCheckRadius;
     [SerializeField]Transform roofCheck;
     public bool isRoofAbove;
-    
+
+    // PRIVATES    
     CharacterController cc;
     Vector3 movementDirection;
-    const float gravityConst = -9.81f;
     int currentJumpCount;
+    float coyoteJumpTimeCounter;
+
+    // CONSTANTS
+    const float gravityConst = -9.81f;
 
     void Start(){
         cc = GetComponent<CharacterController>();
@@ -71,27 +77,8 @@ public class PlayerMovement : MonoBehaviour {
         float z = Input.GetAxis("Vertical");
         movementDirection = (transform.right * x) + (transform.forward * z);
         
-        cc.Move(velocity * Time.deltaTime); // Jump movement
-         
-        
-        if(allowDoubleJump){
-            if(Input.GetKeyDown(jumpKey) && isGrounded || Input.GetKeyDown(jumpKey) && currentJumpCount < allowedExtraJumps){
-                if(!onlyAllowOnDecline){
-                    Jump();
-                }
-                else if(onlyAllowOnDecline && cc.velocity.y < 0.0f){
-                    Jump();
-                }
-                else{
-                    Jump();
-                }
-            }
-        }
-        else{
-            if(Input.GetKeyDown(jumpKey) && isGrounded){
-                Jump();
-            }
-        }
+        // JUMPING
+        HandleJump();
 
         if(Input.GetKey(crouchKey)){    
             CrouchMove();
@@ -111,14 +98,45 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
+    void HandleJump(){
+        cc.Move(velocity * Time.deltaTime); // Perform jump movement
+
+        if(isGrounded){
+            coyoteJumpTimeCounter = coyoteJumpTime;
+        }
+        else{
+            coyoteJumpTimeCounter -= Time.deltaTime;
+        }
+
+        if(coyoteJumpTimeCounter > 0f  && Input.GetKeyDown(jumpKey)){ //is coyoteJumpTimeCounter greater than 0, it means the player is grounded
+            Jump();
+        }
+
+        if(enableCoyoteJump){
+            if(Input.GetKeyUp(jumpKey) && velocity.y > 0.0f){ // releasing jumpkey while on the way up, greater gravity down
+                velocity.y *= coyoteJumpMultiplier * gravityScale;
+                coyoteJumpTimeCounter = 0f;
+            }
+        }
+            
+        if(allowDoubleJump){
+            if(Input.GetKeyDown(jumpKey) && !isGrounded && currentJumpCount < allowedExtraJumps){
+                if(onlyAllowOnDecline && !isGrounded && cc.velocity.y < 0.0f){
+                    Jump();
+                }
+                if(!onlyAllowOnDecline){
+                    Jump();
+                }
+            }
+        }
+    }
+
     void Move(){
         Movement(movementSpeed);
-        // Walking Animations
     }
 
     void Run(){
         Movement(runSpeed);
-        // Run Animations
     }
 
     void CrouchMove(){

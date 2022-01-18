@@ -32529,13 +32529,14 @@ MonoBehaviour:
   runSpeed: 7
   crouchSpeed: 2.5
   jumpHeight: 2
-  doubleJumpTime: 0
-  allowedExtraJumps: 0
-  currentJumpCount: 0
+  allowDoubleJump: 1
+  allowedExtraJumps: 3
+  onlyAllowOnDecline: 1
   crouchMultiplier: 0.5
   deCrouchMultiplier: 2
   isCrouching: 0
   gravityScale: 1
+  velocity: {x: 0, y: 0, z: 0}
   groundCheck: {fileID: 2037068923}
   groundCheckRadius: 0.1
   whatIsGround:
@@ -32548,7 +32549,6 @@ MonoBehaviour:
   roofCheckRadius: 0.2
   roofCheck: {fileID: 1844635179}
   isRoofAbove: 0
-  velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &1170413685
 MonoBehaviour:
   m_ObjectHideFlags: 0
