@@ -32536,6 +32536,8 @@ MonoBehaviour:
   allowDoubleJump: 1
   allowedExtraJumps: 1
   onlyAllowOnDecline: 1
+  climbSpeed: 5
+  isClimbing: 0
   crouchMultiplier: 0.5
   deCrouchMultiplier: 2
   isCrouching: 0
@@ -32559,7 +32561,6 @@ MonoBehaviour:
   climbableCheckRadius: 0.2
   climbableCheck: {fileID: 1997095485}
   isFacingClimbableWall: 0
-  isClimbing: 0
 --- !u!114 &1170413685
 MonoBehaviour:
   m_ObjectHideFlags: 0

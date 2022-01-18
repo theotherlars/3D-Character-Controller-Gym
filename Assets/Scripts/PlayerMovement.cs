@@ -27,6 +27,10 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]int allowedExtraJumps;
     [SerializeField]private bool onlyAllowOnDecline; 
 
+    [Header("Climbing Stuff:")]
+    [SerializeField]float climbSpeed;
+    public bool isClimbing;
+
     [Header("Crouch Stuff:")]
     [SerializeField]float crouchMultiplier;
     [SerializeField]float deCrouchMultiplier;
@@ -48,12 +52,12 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]Transform roofCheck;
     public bool isRoofAbove;
 
-    [Header("Climbing Stuff:")]
+    [Header("Climbing Check Stuff:")]
     [SerializeField]LayerMask whatIsClimbable;
     [SerializeField]float climbableCheckRadius;
     [SerializeField]Transform climbableCheck;
     public bool isFacingClimbableWall;
-    public bool isClimbing;
+    
 
     // PRIVATES    
     CharacterController cc;
@@ -88,7 +92,7 @@ public class PlayerMovement : MonoBehaviour {
 
         if(Input.GetKeyDown(jumpKey) && isFacingClimbableWall){
             isClimbing = true;
-            gravityScale = 0f;
+            gravityScale = -0.1f;
         }
 
         if(!isFacingClimbableWall){
@@ -201,10 +205,10 @@ public class PlayerMovement : MonoBehaviour {
     
     void Climb(){
         isClimbing = true;
-        
+        Vector3 climbMovement = (transform.right * inputX) + (transform.up * inputY); 
 
         if(Input.GetKey(jumpKey)){
-            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
+            cc.Move(climbMovement * climbSpeed * Time.deltaTime);
         }
     }
     
