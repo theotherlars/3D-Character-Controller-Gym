@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]KeyCode runKey;
     [SerializeField]KeyCode jumpKey;
     [SerializeField]KeyCode crouchKey;
+    //test
 
     [Header("Movement Stuff:")]
     [SerializeField]private float movementSpeed;
@@ -18,9 +19,9 @@ public class PlayerMovement : MonoBehaviour {
 
     [Header("Jump Stuff:")]
     [SerializeField]float jumpHeight;
-    [SerializeField]bool enableCoyoteJump;
-    [SerializeField]float coyoteJumpTime;
-    [SerializeField]float coyoteJumpMultiplier;
+    [SerializeField]bool enableAdjustableJump;
+    [SerializeField]float adjustableJumpTime;
+    [SerializeField]float adjustableJumpMultiplier;
     
     [Header("Double Jump Stuff:")]
     [SerializeField]private bool allowDoubleJump;
@@ -63,7 +64,7 @@ public class PlayerMovement : MonoBehaviour {
     CharacterController cc;
     Vector3 movementDirection;
     int currentJumpCount;
-    float coyoteJumpTimeCounter;
+    float adjustableJumpTimeCounter;
     float inputX;
     float inputY;
     float gravityStore;
@@ -92,7 +93,7 @@ public class PlayerMovement : MonoBehaviour {
 
         if(Input.GetKeyDown(jumpKey) && isFacingClimbableWall){
             isClimbing = true;
-            gravityScale = -0.1f;
+            gravityScale = 0f;
         }
 
         if(!isFacingClimbableWall){
@@ -100,13 +101,14 @@ public class PlayerMovement : MonoBehaviour {
         }
 
         if(!isClimbing){
+            gravityScale = gravityStore;
+
             // MOVEMENT
             movementDirection = (transform.right * inputX) + (transform.forward * inputY);
             HandleMovement();
 
             // JUMPING
             HandleJump();
-            gravityScale = gravityStore;
         }
         else{
             Climb();
@@ -157,26 +159,27 @@ public class PlayerMovement : MonoBehaviour {
         cc.Move(velocity * Time.deltaTime); // Perform jump movement
 
         if(isGrounded){
-            coyoteJumpTimeCounter = coyoteJumpTime;
+            adjustableJumpTimeCounter = adjustableJumpTime;
         }
         else{
-            coyoteJumpTimeCounter -= Time.deltaTime;
+            adjustableJumpTimeCounter -= Time.deltaTime;
         }
 
-        if(coyoteJumpTimeCounter > 0f  && Input.GetKeyDown(jumpKey)){ //is coyoteJumpTimeCounter greater than 0, it means the player is grounded
+        if(adjustableJumpTimeCounter > 0f  && Input.GetKeyDown(jumpKey)){ //is adjustableJumpTimeCounter greater than 0, it means the player is grounded
             Jump();
         }
 
-        if(enableCoyoteJump){
+        if(enableAdjustableJump){
             if(Input.GetKeyUp(jumpKey) && velocity.y > 0.0f){ // releasing jumpkey while on the way up, greater gravity down
-                velocity.y *= coyoteJumpMultiplier;
-                coyoteJumpTimeCounter = 0f;
+                velocity.y *= adjustableJumpMultiplier;
+                adjustableJumpTimeCounter = 0f;
             }
         }
-            
+
+        // DOUBLE JUMP             
         if(allowDoubleJump){
             if(Input.GetKeyDown(jumpKey) && !isGrounded && currentJumpCount < allowedExtraJumps){
-                if(onlyAllowOnDecline && !isGrounded && cc.velocity.y < 0.0f){
+                if(onlyAllowOnDecline && cc.velocity.y < 0.0f){
                     Jump();
                 }
                 if(!onlyAllowOnDecline){
@@ -204,12 +207,10 @@ public class PlayerMovement : MonoBehaviour {
     }
     
     void Climb(){
-        isClimbing = true;
         Vector3 climbMovement = (transform.right * inputX) + (transform.up * inputY); 
-
-        if(Input.GetKey(jumpKey)){
+        
             cc.Move(climbMovement * climbSpeed * Time.deltaTime);
-        }
+        
     }
     
     void CrouchMove(){
@@ -218,26 +219,18 @@ public class PlayerMovement : MonoBehaviour {
 
     void Crouch(){
         isCrouching = true;
-        
         cc.height *= crouchMultiplier;
-        
-        Vector3 roofCheckPos = roofCheck.localPosition;
-        roofCheck.localPosition -= new Vector3(roofCheckPos.x, roofCheckPos.y * crouchMultiplier, roofCheckPos.z);
-
-        Vector3 camPos = Camera.main.transform.localPosition;
-        Camera.main.transform.localPosition -= new Vector3(camPos.x, camPos.y * crouchMultiplier,camPos.z);
+        Camera.main.transform.localPosition -= new Vector3(0, Camera.main.transform.localPosition.y * crouchMultiplier,0);
+        roofCheck.localPosition *= 0.5f;
+        groundCheck.localPosition *= 0.5f; 
     }
 
     void UnCrouch(){
         isCrouching = false;
-        
         cc.height *= deCrouchMultiplier;
-        
-        Vector3 roofCheckPos = roofCheck.localPosition;
-        roofCheck.localPosition -= new Vector3(roofCheckPos.x, roofCheckPos.y * deCrouchMultiplier, roofCheckPos.z);
-
-        Vector3 camPos = Camera.main.transform.localPosition;
-        Camera.main.transform.localPosition = new Vector3(camPos.x,camPos.y * deCrouchMultiplier,camPos.z);
+        Camera.main.transform.localPosition += new Vector3(0,Camera.main.transform.localPosition.y,0);
+        roofCheck.localPosition *= 2;
+        groundCheck.localPosition *= 2;
     }
 
     bool IsGrounded(){
