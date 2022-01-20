@@ -14,6 +14,11 @@ public class Target : MonoBehaviour{
         if(TryGetComponent(out Animator anim)){
             anim.SetTrigger("Die");
             GetComponent<CapsuleCollider>().height = 0.1f;
+            Destroy(gameObject,2);
         }
+    }
+
+    public void Hook(){
+        
     }
 }

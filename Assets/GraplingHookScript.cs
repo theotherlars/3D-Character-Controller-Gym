@@ -1,9 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponScript : MonoBehaviour
+public class GraplingHookScript : MonoBehaviour
 {
     [Header("Input Stuff:")]
     [SerializeField]KeyCode fireKey = KeyCode.Mouse0;
@@ -16,8 +15,8 @@ public class WeaponScript : MonoBehaviour
     [SerializeField]Vector3 aimPos;
 
     [Header("Visual Stuff:")]
-    [SerializeField] ParticleSystem HitEffect;
-    [SerializeField] ParticleSystem MuzzleFlash;
+    // [SerializeField] ParticleSystem HitEffect;
+    [SerializeField] ParticleSystem ShootEffect;
     
     [Header("Debug Stuff:")]
     [SerializeField]bool debug;
@@ -25,6 +24,7 @@ public class WeaponScript : MonoBehaviour
     Camera cam;
     Vector3 tempGunPos;
     Animator anim;
+    Rigidbody rb;
 
     void Start(){
         cam = Camera.main;
@@ -46,13 +46,13 @@ public class WeaponScript : MonoBehaviour
 
     private void Shoot(){
         
-        MuzzleFlash.Play();
+        // MuzzleFlash.Play();
         anim.SetTrigger("Shoot");
 
         RaycastHit hit;
-        if(Physics.Raycast(cam.transform.position + cam.transform.forward, cam.transform.forward, out hit, shootDistance)){
-            ParticleSystem effect = Instantiate(HitEffect, hit.point, Quaternion.LookRotation(hit.normal));
-            Destroy(effect,HitEffect.main.duration);            
+        if(Physics.Raycast(cam.transform.position + cam.transform.forward, cam.transform.forward, out hit, shootDistance, whatToShoot)){
+            // ParticleSystem effect = Instantiate(HitEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            // Destroy(effect,HitEffect.main.duration);            
             if(debug){Debug.Log(hit.collider.name);}
             if(hit.collider.TryGetComponent(out Target target)){
                 target.Hit();

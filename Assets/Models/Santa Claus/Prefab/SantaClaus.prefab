@@ -2713,6 +2713,7 @@ GameObject:
   - component: {fileID: 4751922330993925962}
   - component: {fileID: 3420549815832359472}
   - component: {fileID: -402264419416216859}
+  - component: {fileID: 53624993627323789}
   m_Layer: 6
   m_Name: SantaClaus
   m_TagString: Player
@@ -2729,13 +2730,13 @@ Transform:
   m_GameObject: {fileID: 8622530670846373209}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.75, y: 1.75, z: 1.75}
   m_Children:
   - {fileID: 3103514652128459047}
   - {fileID: 4965682369247919371}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 134.309, z: 0}
 --- !u!95 &3420549815832359472
 Animator:
   serializedVersion: 3
@@ -2769,6 +2770,33 @@ CapsuleCollider:
   m_Height: 1.9378002
   m_Direction: 1
   m_Center: {x: 0, y: 0.96754277, z: -0.06686488}
+--- !u!114 &53624993627323789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8622530670846373209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f43e081e6b427a449b51cad6d40d5c8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnHitEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 53624993627323789}
+        m_TargetAssemblyTypeName: Target, Assembly-CSharp
+        m_MethodName: Die
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8623028791775734088
 GameObject:
   m_ObjectHideFlags: 0
