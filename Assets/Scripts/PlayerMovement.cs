@@ -62,6 +62,7 @@ public class PlayerMovement : MonoBehaviour {
 
     // PRIVATES    
     CharacterController cc;
+    public Animator anim;
     Vector3 movementDirection;
     int currentJumpCount;
     float adjustableJumpTimeCounter;
@@ -74,6 +75,7 @@ public class PlayerMovement : MonoBehaviour {
 
     void Start(){
         cc = GetComponent<CharacterController>();
+        // anim = GetComponent<Animator>();
         currentJumpCount = 0;
         gravityStore = gravityScale;
     }
