@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement_3rd_Person : MonoBehaviour {
@@ -60,17 +61,18 @@ public class PlayerMovement_3rd_Person : MonoBehaviour {
     public bool isFacingClimbableWall;
     
     [Header("Camera Stuff:")]
+    [SerializeField]bool invertY;
     [SerializeField]float turnSmoothTime;
-    
     [SerializeField]Transform followTarget;
     [SerializeField]float rotationPower;
 
     // PRIVATES    
     CharacterController cc;
-    public Animator anim;
+    [SerializeField]CinemachineVirtualCamera cineCam;
+    float cameraDistance;
+    [SerializeField] Animator anim;
     [SerializeField]Transform cam;
 
-    [HideInInspector]
     public Vector3 movementDirection;
     int currentJumpCount;
     float adjustableJumpTimeCounter;
@@ -116,8 +118,7 @@ public class PlayerMovement_3rd_Person : MonoBehaviour {
             gravityScale = gravityStore;
 
             // MOVEMENT
-            // movementDirection = (transform.right * inputX) + (transform.forward * inputY);
-            movementDirection = new Vector3(inputX,0,inputY).normalized;
+            movementDirection = (transform.right * inputX) + (transform.forward * inputY);
             HandleMovement();
 
             // JUMPING
@@ -127,8 +128,6 @@ public class PlayerMovement_3rd_Person : MonoBehaviour {
             Climb();
         }
     }
-
-    
 
     void HandleGravity(){
         if(isGrounded && velocity.y < 0.0f){
@@ -203,20 +202,46 @@ public class PlayerMovement_3rd_Person : MonoBehaviour {
     }
 
     void Movement(float speed){
-        // cc.Move(movementDirection * speed * Time.deltaTime);
-    followTarget.rotation *= Quaternion.AngleAxis(movementDirection.x * rotationPower, Vector3.up);
-
-
-        // if(movementDirection.magnitude >= 0.1f){
-        //     float targetAngle = Mathf.Atan2(movementDirection.x, movementDirection.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-        //     float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle,ref turnSmoothVelocity,turnSmoothTime);
-        //     transform.rotation = Quaternion.Euler(0f,angle,0f);
-        //     Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-        //     cc.Move(moveDirection.normalized * speed * Time.deltaTime);
-        //     transform.position = new Vector3(transform.position.x,1,transform.position.z);
-        // }
+        if(movementDirection.magnitude > 0){
+            movementDirection.Normalize();
+            cc.Move(movementDirection * speed * Time.deltaTime);
+        }
+        
+        // Animations
+        HandleMovementAnimations();
+        
+        // Rotation handling
+        transform.rotation *= Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotationPower, Vector3.up);
+        followTarget.transform.rotation *= Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotationPower, Vector3.up);
+        if(invertY){
+            followTarget.transform.rotation *= Quaternion.AngleAxis(Input.GetAxis("Mouse Y") * rotationPower, Vector3.right);
+        }
+        else{
+            followTarget.transform.rotation *= Quaternion.AngleAxis(-Input.GetAxis("Mouse Y") * rotationPower, Vector3.right);
+        }
+        var angles = followTarget.transform.localEulerAngles;
+        angles.z = 0;
+        var angle = followTarget.transform.localEulerAngles.x;
+        if(angle > 180 && angle < 340){
+            angles.x = 340;
+        }
+        else if(angle < 180 && angle > 40){
+            angles.x = 40;
+        }
+        followTarget.transform.localEulerAngles = angles;
+        transform.rotation = Quaternion.Euler(0,followTarget.transform.rotation.eulerAngles.y, 0);
+        followTarget.transform.localEulerAngles = new Vector3(angles.x, 0,0);
     }
     
+    void HandleMovementAnimations(){
+        Vector3 direction = new Vector3(inputX,0,inputY).normalized;
+        float velocityZ = Vector3.Dot(direction.normalized, transform.forward);
+        float velocityX = Vector3.Dot(direction.normalized, transform.right);
+
+        anim.SetFloat("velocityZ",direction.normalized.z);//,0.1f,Time.deltaTime);
+        anim.SetFloat("velocityX",direction.normalized.x);//,0.1f,Time.deltaTime);
+    }
+
     void Move(){
         Movement(movementSpeed);
     }
@@ -226,6 +251,7 @@ public class PlayerMovement_3rd_Person : MonoBehaviour {
     }
 
     void Jump(){
+        anim.SetTrigger("jump");
         currentJumpCount += 1;
         velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
     }

@@ -47,11 +47,12 @@ public class WeaponScript : MonoBehaviour
     private void Shoot(){
         
         MuzzleFlash.Play();
-        anim.SetTrigger("Shoot");
+        // anim.SetTrigger("Shoot");
 
         RaycastHit hit;
         if(Physics.Raycast(cam.transform.position + cam.transform.forward, cam.transform.forward, out hit, shootDistance, whatToShoot)){
             ParticleSystem effect = Instantiate(HitEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            effect.transform.parent = hit.collider.gameObject.transform;
             Destroy(effect,HitEffect.main.duration);            
             if(debug){Debug.Log(hit.collider.name);}
             if(hit.collider.TryGetComponent(out Target target)){
