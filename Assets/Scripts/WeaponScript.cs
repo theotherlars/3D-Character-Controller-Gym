@@ -50,7 +50,7 @@ public class WeaponScript : MonoBehaviour
         anim.SetTrigger("Shoot");
 
         RaycastHit hit;
-        if(Physics.Raycast(cam.transform.position + cam.transform.forward, cam.transform.forward, out hit, shootDistance)){
+        if(Physics.Raycast(cam.transform.position + cam.transform.forward, cam.transform.forward, out hit, shootDistance, whatToShoot)){
             ParticleSystem effect = Instantiate(HitEffect, hit.point, Quaternion.LookRotation(hit.normal));
             Destroy(effect,HitEffect.main.duration);            
             if(debug){Debug.Log(hit.collider.name);}
