@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &812917141380185145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7985464136841144329}
+  m_Layer: 6
+  m_Name: LeftWallRunCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7985464136841144329
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812917141380185145}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.5, y: -1.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7336790134487695963}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7336790133039745041
 GameObject:
   m_ObjectHideFlags: 0
@@ -87,7 +117,6 @@ GameObject:
   - component: {fileID: 7336790133378781219}
   - component: {fileID: 7336790133378781220}
   - component: {fileID: 7336790133378781221}
-  - component: {fileID: 7336790133378781223}
   m_Layer: 6
   m_Name: Playah FPS
   m_TagString: Player
@@ -180,7 +209,12 @@ MonoBehaviour:
   climbableCheckRadius: 0.4
   climbableCheck: {fileID: 7336790133609876077}
   isFacingClimbableWall: 0
-  anim: {fileID: 0}
+  allowWallRun: 1
+  whatIsWallRun:
+    serializedVersion: 2
+    m_Bits: 512
+  wallRunRightCheck: {fileID: 5792965529772161375}
+  wallRunLeftCheck: {fileID: 7985464136841144329}
 --- !u!114 &7336790133378781221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196,25 +230,6 @@ MonoBehaviour:
   mouseSensitivity: 250
   maxLookUp: -75
   maxLookDown: 75
---- !u!95 &7336790133378781223
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7336790133378781217}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b23dc2c196f149a4c933621c0bd6691b, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &7336790133570157610
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,6 +538,8 @@ Transform:
   - {fileID: 7336790133570157611}
   - {fileID: 7336790133780508283}
   - {fileID: 7336790133609876077}
+  - {fileID: 7985464136841144329}
+  - {fileID: 5792965529772161375}
   m_Father: {fileID: 7336790133378781218}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -623,6 +640,36 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &7443159983711435582
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5792965529772161375}
+  m_Layer: 6
+  m_Name: RightWallRunCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5792965529772161375
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7443159983711435582}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: -1.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7336790134487695963}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2755876016452144274
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -58,11 +58,19 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]float climbableCheckRadius;
     [SerializeField]Transform climbableCheck;
     public bool isFacingClimbableWall;
+
+    [Header("Wall Run Check Stuff:")]
+    [SerializeField]bool allowWallRun;
+    [SerializeField]LayerMask whatIsWallRun;
+    [SerializeField]Transform wallRunRightCheck;
+    [SerializeField]Transform wallRunLeftCheck;
+    [SerializeField]float wallRunCheckRadius;
+    public bool isWallRunning;
     
 
     // PRIVATES    
     CharacterController cc;
-    public Animator anim;
+    Animator anim;
     Vector3 movementDirection;
     int currentJumpCount;
     float adjustableJumpTimeCounter;
@@ -75,7 +83,6 @@ public class PlayerMovement : MonoBehaviour {
 
     void Start(){
         cc = GetComponent<CharacterController>();
-        // anim = GetComponent<Animator>();
         currentJumpCount = 0;
         gravityStore = gravityScale;
     }
@@ -98,11 +105,19 @@ public class PlayerMovement : MonoBehaviour {
             gravityScale = 0f;
         }
 
+        if(!isGrounded && IsWallRunAvailable()){
+            isWallRunning = true;
+            WallRun();
+        }
+
         if(!isFacingClimbableWall){
             isClimbing = false;
         }
+        if(!IsWallRunAvailable()){
+            isWallRunning = false;
+        }
 
-        if(!isClimbing){
+        if(!isClimbing && !isWallRunning){
             gravityScale = gravityStore;
 
             // MOVEMENT
@@ -112,13 +127,14 @@ public class PlayerMovement : MonoBehaviour {
             // JUMPING
             HandleJump();
         }
-        else{
+        else if(isClimbing){
             Climb();
         }
+        else if(isWallRunning){
+            WallRun();
+        }
     }
-
     
-
     void HandleGravity(){
         if(isGrounded && velocity.y < 0.0f){
             velocity.y = -2;
@@ -130,31 +146,26 @@ public class PlayerMovement : MonoBehaviour {
 
     void HandleMovement()
     {
-        if (Input.GetKey(crouchKey) || isCrouching)
-        {
+        if (Input.GetKey(crouchKey) || isCrouching){
             CrouchMove();
         }
-        else if (Input.GetKey(runKey))
-        {
+        else if (Input.GetKey(runKey)){
             Run();
         }
-        else
-        {
+        else{
             Move();
         }
 
-        if (Input.GetKeyDown(crouchKey) && !isCrouching)
-        {
+        if (Input.GetKeyDown(crouchKey) && !isCrouching){
             Crouch();
         }
-        if (Input.GetKeyUp(crouchKey) && !IsRoofAbove())
-        {
+        if (Input.GetKeyUp(crouchKey) && !IsRoofAbove()){
             UnCrouch();
         }
-        if (isCrouching && !Input.GetKey(crouchKey) && !IsRoofAbove())
-        {
+        if (isCrouching && !Input.GetKey(crouchKey) && !IsRoofAbove()){
             UnCrouch();
         }
+
     }
 
     void HandleJump(){
@@ -210,11 +221,25 @@ public class PlayerMovement : MonoBehaviour {
     
     void Climb(){
         Vector3 climbMovement = (transform.right * inputX) + (transform.up * inputY); 
-        
-            cc.Move(climbMovement * climbSpeed * Time.deltaTime);
-        
+        cc.Move(climbMovement * climbSpeed * Time.deltaTime);
     }
-    
+
+    void WallRun(){
+        gravityScale = 0;
+        Vector3 wallRunMovement = Vector3.zero;
+        bool rightWall = Physics.CheckSphere(wallRunRightCheck.position,wallRunCheckRadius,whatIsWallRun);
+        bool leftWall = Physics.CheckSphere(wallRunLeftCheck.position,wallRunCheckRadius,whatIsWallRun);
+        if(rightWall){
+            wallRunMovement = (transform.up * inputX) + (transform.forward * inputY); 
+        }
+        
+        if(leftWall){
+            wallRunMovement = (-transform.up * inputX) + (transform.forward * inputY); 
+        }
+
+        cc.Move(wallRunMovement * runSpeed * Time.deltaTime);
+    }
+
     void CrouchMove(){
         Movement(crouchSpeed);
     }
@@ -250,10 +275,17 @@ public class PlayerMovement : MonoBehaviour {
             val = true;
         }
         return val;
-        // Physics.Raycast(roofCheck.position,Vector3.up,roofCheckRadius,whatIsRoof);
-        // return Physics.CheckSphere(roofCheck.position,roofCheckRadius,whatIsRoof);
     }
     
+    bool IsWallRunAvailable(){
+        bool val = false;
+        val = Physics.CheckSphere(wallRunRightCheck.position,wallRunCheckRadius,whatIsWallRun);
+        if(!val){
+            val = Physics.CheckSphere(wallRunLeftCheck.position,wallRunCheckRadius,whatIsWallRun);
+        }
+        return val;
+    }
+
     bool IsFacingClimbableWall(){
         bool val = false;
         val = Physics.CheckSphere(climbableCheck.position,climbableCheckRadius,whatIsClimbable);
