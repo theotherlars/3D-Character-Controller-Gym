@@ -177,6 +177,7 @@ MonoBehaviour:
   movementSpeed: 5
   runSpeed: 10
   crouchSpeed: 2.5
+  wallRunSpeed: 6
   jumpHeight: 3
   enableAdjustableJump: 1
   adjustableJumpTime: 0.3
@@ -215,6 +216,8 @@ MonoBehaviour:
     m_Bits: 512
   wallRunRightCheck: {fileID: 5792965529772161375}
   wallRunLeftCheck: {fileID: 7985464136841144329}
+  wallRunCheckRadius: 0
+  isWallRunning: 0
 --- !u!114 &7336790133378781221
 MonoBehaviour:
   m_ObjectHideFlags: 0

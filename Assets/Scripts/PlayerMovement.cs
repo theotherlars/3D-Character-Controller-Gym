@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]private float movementSpeed;
     [SerializeField]private float runSpeed;
     [SerializeField]private float crouchSpeed;
+    [SerializeField]private float wallRunSpeed;
 
     [Header("Jump Stuff:")]
     [SerializeField]float jumpHeight;
@@ -77,6 +78,7 @@ public class PlayerMovement : MonoBehaviour {
     float inputX;
     float inputY;
     float gravityStore;
+    bool doOnceWallRunReset = false;
 
     // CONSTANTS
     const float gravityConst = -9.81f;
@@ -115,6 +117,10 @@ public class PlayerMovement : MonoBehaviour {
         }
         if(!IsWallRunAvailable()){
             isWallRunning = false;
+            if(doOnceWallRunReset){
+                doOnceWallRunReset = false;
+                transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
+            }
         }
 
         if(!isClimbing && !isWallRunning){
@@ -225,19 +231,27 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     void WallRun(){
-        gravityScale = 0;
+        gravityScale = 2;
+        doOnceWallRunReset = true;
         Vector3 wallRunMovement = Vector3.zero;
         bool rightWall = Physics.CheckSphere(wallRunRightCheck.position,wallRunCheckRadius,whatIsWallRun);
         bool leftWall = Physics.CheckSphere(wallRunLeftCheck.position,wallRunCheckRadius,whatIsWallRun);
         if(rightWall){
             wallRunMovement = (transform.up * inputX) + (transform.forward * inputY); 
+            transform.localEulerAngles += new Vector3(0,0,35);
+            cc.transform.localEulerAngles += new Vector3(0,0,35);
         }
         
         if(leftWall){
             wallRunMovement = (-transform.up * inputX) + (transform.forward * inputY); 
+             transform.localEulerAngles -= new Vector3(0,0,35);
+            cc.transform.localEulerAngles -= new Vector3(0,0,35);
         }
 
-        cc.Move(wallRunMovement * runSpeed * Time.deltaTime);
+        if(Input.GetKeyDown(jumpKey)){
+            Jump();
+        }
+        cc.Move(wallRunMovement * wallRunSpeed * Time.deltaTime);
     }
 
     void CrouchMove(){
@@ -295,6 +309,8 @@ public class PlayerMovement : MonoBehaviour {
     private void OnDrawGizmosSelected(){
         if(groundCheck){Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);}
         if(climbableCheck){Gizmos.DrawWireSphere(climbableCheck.position,climbableCheckRadius);}
+        if(wallRunLeftCheck){Gizmos.DrawSphere(wallRunLeftCheck.position,wallRunCheckRadius);}
+        if(wallRunRightCheck){Gizmos.DrawSphere(wallRunRightCheck.position,wallRunCheckRadius);}
         // if(roofCheck){Gizmos.DrawRay(roofCheck.position,Vector3.up);}
     }
 }
