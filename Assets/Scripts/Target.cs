@@ -13,8 +13,8 @@ public class Target : MonoBehaviour{
     public void Die(){
         if(TryGetComponent(out Animator anim)){
             anim.SetTrigger("Die");
-            GetComponent<CapsuleCollider>().height = 0.1f;
-            Destroy(gameObject,2);
+            // GetComponent<CapsuleCollider>().height = 0.1f;
+            Destroy(gameObject,5);
         }
     }
 
