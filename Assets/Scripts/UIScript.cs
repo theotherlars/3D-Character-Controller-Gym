@@ -21,7 +21,5 @@ public class UIScript : MonoBehaviour{
 
     private void Update() {
         fuelImage.fillAmount = playerFuel / 100;
-        print(playerFuel / 100);
-
     }
 }
