@@ -91,16 +91,18 @@ public class WeaponScript : MonoBehaviour
 
     private void Aim(){
         gunpos.localPosition = aimPos;
-        cam.fieldOfView = aimFOV;
+        StartCoroutine(Zoom(aimFOV,1));
     }
 
     IEnumerator Zoom(float targetFOV,float duration){
         float timer = 0;
-        while(timer < duration){
-            cam.fieldOfView = 
+        float target = (cam.fieldOfView - targetFOV) - cam.fieldOfView;
+        while(cam.fieldOfView <= target){
+            cam.fieldOfView = target / duration * Time.deltaTime;
             timer += Time.deltaTime;
             yield return null;
         }
+        cam.fieldOfView = targetFOV;
     }
 
     private void UnAim(){

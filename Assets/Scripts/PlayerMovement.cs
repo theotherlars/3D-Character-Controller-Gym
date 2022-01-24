@@ -251,7 +251,9 @@ public class PlayerMovement : MonoBehaviour {
     void JetPackThrust(){
         velocity.y = Mathf.Sqrt(thrustForce * -2 * gravityConst * gravityScale);
         jetPackFuel -= jetPackFuelUsage * Time.deltaTime;
-        UIScript.Instance.playerFuel = jetPackFuel;
+        if(UIScript.Instance){
+            UIScript.Instance.playerFuel = jetPackFuel;
+        }
     }
 
     void Climb(){
