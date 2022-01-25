@@ -222,6 +222,7 @@ MonoBehaviour:
   wallRunFOV: 70
   wallRunFOVSpeed: 0
   gravityScaleWallRunning: 0
+  wallJumpForce: 0
   whatIsWallRun:
     serializedVersion: 2
     m_Bits: 512
@@ -700,6 +701,10 @@ PrefabInstance:
     - target: {fileID: 2942280423441285070, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
       propertyPath: fireRate
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2942280423441285070, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
+      propertyPath: whatToShoot.m_Bits
+      value: 959
       objectReference: {fileID: 0}
     - target: {fileID: 2942280423441285071, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
       propertyPath: m_RootOrder

@@ -300,7 +300,6 @@ public class PlayerMovement : MonoBehaviour {
     }
     
     void WallJump(bool jumpRight){
-        Debug.Log("Bool: " + jumpRight + " LocalEulerAngels.Y: " + transform.localEulerAngles.y);
         if(jumpRight){
             velocity.x = Mathf.Sqrt(wallJumpForce * -2 * gravityConst * gravityScaleWallRunning) * -transform.right.x;
             Jump();
