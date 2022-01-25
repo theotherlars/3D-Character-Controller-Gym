@@ -45,10 +45,11 @@ public class WeaponScript : MonoBehaviour
         anim = GetComponentInParent<Animator>();
         tempGunPos = gunpos.localPosition;
         orgFOV = cam.fieldOfView;
+        currentMagazine = magazineSize;
     }
 
     void Update(){
-        if(Input.GetKeyDown(fireKey) && magazineSize > 0){
+        if(Input.GetKeyDown(fireKey) && currentMagazine > 0){
             Shoot();
         }
         
@@ -60,19 +61,24 @@ public class WeaponScript : MonoBehaviour
             UnAim();
         }
 
-        if(Input.GetKey(fireKey) && autoShoot && magazineSize > 0){
+        if(Input.GetKey(fireKey) && autoShoot && currentMagazine > 0){
             if(Time.time >= nextFire){
                 nextFire = Time.time + (1 / fireRate);
                 Shoot();
             }
         }
+
+        if(Input.GetKeyDown(reloadKey)){
+            currentMagazine = magazineSize;
+        }
+        UIScript.Instance.currentMagazine = currentMagazine;
     }
 
     private void Shoot(){
         
         MuzzleFlash.Stop();
         MuzzleFlash.Play();
-
+        currentMagazine --;
         RaycastHit hit;
         if(Physics.Raycast(cam.transform.position + cam.transform.forward, cam.transform.forward, out hit, shootDistance, whatToShoot)){
             ParticleSystem effect = Instantiate(HitEffect, hit.point, Quaternion.LookRotation(hit.normal));
@@ -85,7 +91,6 @@ public class WeaponScript : MonoBehaviour
             if(hit.collider.TryGetComponent(out Rigidbody targetRb)){
                 targetRb.AddForceAtPosition(-hit.normal*hitForce, hit.point);
             }
-            currentMagazine --;
         }
     }
 

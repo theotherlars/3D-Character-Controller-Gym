@@ -8,10 +8,10 @@ public class UIScript : MonoBehaviour{
 
     private static UIScript instance;
     public static UIScript Instance { get => instance;}
-
     [SerializeField]Image fuelImage;
-    [HideInInspector]
-    public float playerFuel;
+    [SerializeField]TextMeshProUGUI magazineText;
+    [HideInInspector] public float playerFuel;
+    [HideInInspector] public float currentMagazine;
 
     private void Awake() {
         if(instance == null){
@@ -21,5 +21,11 @@ public class UIScript : MonoBehaviour{
 
     private void Update() {
         fuelImage.fillAmount = playerFuel / 100;
+        if(currentMagazine > 0){
+            magazineText.text = currentMagazine.ToString();
+        }
+        else{
+            magazineText.text = "[R]eload";
+        }
     }
 }

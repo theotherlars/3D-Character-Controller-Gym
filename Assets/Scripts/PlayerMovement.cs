@@ -13,10 +13,14 @@ public class PlayerMovement : MonoBehaviour {
     //test
 
     [Header("Movement Stuff:")]
-    [SerializeField]private float movementSpeed;
-    [SerializeField]private float runSpeed;
-    [SerializeField]private float crouchSpeed;
-    [SerializeField]private float wallRunSpeed;
+    [SerializeField]float movementSpeed;
+    [SerializeField]float crouchSpeed;
+    [SerializeField]float wallRunSpeed;
+
+    [Header("Running Stuff:")]
+    [SerializeField]float runSpeed;
+    [SerializeField]float runFOV;
+    [SerializeField]float runFOVSpeed;
 
     [Header("Jump Stuff:")]
     [SerializeField]float jumpHeight;
@@ -25,9 +29,9 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]float adjustableJumpMultiplier;
     
     [Header("Double Jump Stuff:")]
-    [SerializeField]private bool allowDoubleJump;
+    [SerializeField]bool allowDoubleJump;
     [SerializeField]int allowedExtraJumps;
-    [SerializeField]private bool onlyAllowOnDecline; 
+    [SerializeField]bool onlyAllowOnDecline; 
 
     [Header("Jet Pack Stuff:")]
     [SerializeField]bool allowJetPack;
@@ -68,27 +72,38 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField]Transform climbableCheck;
     public bool isFacingClimbableWall;
 
-    [Header("Wall Run Check Stuff:")]
+    [Header("Wall Run Stuff:")]
     [SerializeField]bool allowWallRun;
     [SerializeField]float wallRunRotation;
+    [SerializeField]float wallRunFOV;
+    [SerializeField]float wallRunFOVSpeed;
+    [SerializeField]float gravityScaleWallRunning;
+    [SerializeField]float wallJumpForce;
     [SerializeField]LayerMask whatIsWallRun;
     [SerializeField]Transform wallRunRightCheck;
     [SerializeField]Transform wallRunLeftCheck;
     [SerializeField]float wallRunCheckRadius;
     public bool isWallRunning;
+
+    [Header("Other Stuff:")]
+    [SerializeField]float FOVBackToNormalSpeed;
     
 
     // PRIVATES    
     CharacterController cc;
     Animator anim;
     Vector3 movementDirection;
-    int currentJumpCount;
-    float adjustableJumpTimeCounter;
     float inputX;
     float inputY;
+    int currentJumpCount;
+    float adjustableJumpTimeCounter;
     float gravityStore;
     bool doOnceWallRunReset = false;
-    private float jetPackTimer;
+    float jetPackTimer;
+    float orgFOV;
+    Camera cam;
+    bool isRunning;
+    bool isWalking;
     
 
     // CONSTANTS
@@ -96,9 +111,11 @@ public class PlayerMovement : MonoBehaviour {
 
     void Start(){
         cc = GetComponent<CharacterController>();
+        cam = Camera.main;
         currentJumpCount = 0;
         gravityStore = gravityScale;
         UIScript.Instance.playerFuel = jetPackFuel;
+        orgFOV = cam.fieldOfView;
     }
 
     void Update(){
@@ -114,19 +131,25 @@ public class PlayerMovement : MonoBehaviour {
         inputX = Input.GetAxis("Horizontal");
         inputY = Input.GetAxis("Vertical");
 
+        // ENGAGE CLIMBING
         if(Input.GetKeyDown(jumpKey) && isFacingClimbableWall){
             isClimbing = true;
             gravityScale = 0f;
         }
 
-        if(!isGrounded && IsWallRunAvailable()){
+        // ENGAGE WALLRUN
+        if(!isGrounded && IsWallRunAvailable() && !isWallRunning && isRunning){
             isWallRunning = true;
             WallRun();
         }
 
+        // DISENGAGE CLIMBING
         if(!isFacingClimbableWall){
             isClimbing = false;
+            gravityScale = gravityStore;
         }
+
+        // DISENGAGE WALLRUN
         if(!IsWallRunAvailable()){
             isWallRunning = false;
             if(doOnceWallRunReset){
@@ -135,8 +158,12 @@ public class PlayerMovement : MonoBehaviour {
             }
         }
         
-        if(Input.GetKey(jumpKey) && allowJetPack && jetPackFuel > 0){
-        {
+        if(isGrounded){
+            velocity.x = 0;
+        }
+
+        // ENAGE JETPACK
+        if(Input.GetKey(jumpKey) && currentJumpCount > 0 && allowJetPack && jetPackFuel > 0){
             if(jetPackTimer >= jetPackTime){
                 JetPackThrust();
             }
@@ -144,10 +171,10 @@ public class PlayerMovement : MonoBehaviour {
                 jetPackTimer += Time.deltaTime;
             }
         }
-        }
 
+        // ENGAGE MOVEMENT - EITHER NORMAL, CLIMBING OR WALLRUN
         if(!isClimbing && !isWallRunning){
-            gravityScale = gravityStore;
+            // gravityScale = gravityStore;
 
             // MOVEMENT
             movementDirection = (transform.right * inputX) + (transform.forward * inputY);
@@ -161,6 +188,21 @@ public class PlayerMovement : MonoBehaviour {
         }
         else if(isWallRunning){
             WallRun();
+            doOnceWallRunReset = true;
+        }
+
+        if(isWallRunning){
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, wallRunFOV, wallRunFOVSpeed);
+        }
+        else{
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, orgFOV, FOVBackToNormalSpeed);
+        }
+
+        if(isRunning){
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, runFOV, runFOVSpeed);
+        }
+        else{
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, orgFOV, FOVBackToNormalSpeed);
         }
     }
     
@@ -168,9 +210,13 @@ public class PlayerMovement : MonoBehaviour {
         if(isGrounded && velocity.y < 0.0f){
             velocity.y = -2;
         }
+        else if(isWallRunning){
+            velocity.y += gravityConst * gravityScaleWallRunning * Time.deltaTime;
+        }
         else{
             velocity.y += gravityConst * gravityScale * Time.deltaTime;
         }
+        cc.Move(velocity * Time.deltaTime);
     }
 
     void HandleMovement()
@@ -179,9 +225,13 @@ public class PlayerMovement : MonoBehaviour {
             CrouchMove();
         }
         else if (Input.GetKey(runKey)){
+            isRunning = true;
+            isWalking = false;
             Run();
         }
         else{
+            isRunning = false;
+            isWalking = true;
             Move();
         }
 
@@ -245,9 +295,22 @@ public class PlayerMovement : MonoBehaviour {
 
     void Jump(){
         currentJumpCount += 1;
+        jetPackTimer = 0;
         velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravityConst * gravityScale);
     }
     
+    void WallJump(bool jumpRight){
+        Debug.Log("Bool: " + jumpRight + " LocalEulerAngels.Y: " + transform.localEulerAngles.y);
+        if(jumpRight){
+            velocity.x = Mathf.Sqrt(wallJumpForce * -2 * gravityConst * gravityScaleWallRunning) * -transform.right.x;
+            Jump();
+        }
+        else{
+            velocity.x = Mathf.Sqrt(wallJumpForce * -2 * gravityConst * gravityScaleWallRunning) * transform.right.x;
+            Jump();
+        }
+    }
+
     void JetPackThrust(){
         velocity.y = Mathf.Sqrt(thrustForce * -2 * gravityConst * gravityScale);
         jetPackFuel -= jetPackFuelUsage * Time.deltaTime;
@@ -261,27 +324,26 @@ public class PlayerMovement : MonoBehaviour {
         cc.Move(climbMovement * climbSpeed * Time.deltaTime);
     }
 
-    void WallRun(){
-        gravityScale = 1;
-        doOnceWallRunReset = true;
+    void WallRun(){        
         Vector3 wallRunMovement = Vector3.zero;
+        
         bool rightWall = Physics.CheckSphere(wallRunRightCheck.position,wallRunCheckRadius,whatIsWallRun);
         bool leftWall = Physics.CheckSphere(wallRunLeftCheck.position,wallRunCheckRadius,whatIsWallRun);
+
         if(rightWall){
-            wallRunMovement = (transform.up * inputX) + (transform.forward * inputY); 
-            transform.localEulerAngles += new Vector3(0,0,wallRunRotation);
-            cc.transform.localEulerAngles += new Vector3(0,0,wallRunRotation);
+            wallRunMovement = (transform.forward * inputY); 
+            cam.transform.localEulerAngles += new Vector3(0,0,wallRunRotation);
         }
         
         if(leftWall){
-            wallRunMovement = (-transform.up * inputX) + (transform.forward * inputY); 
-             transform.localEulerAngles -= new Vector3(0,0,wallRunRotation);
-            cc.transform.localEulerAngles -= new Vector3(0,0,wallRunRotation);
+            wallRunMovement = (transform.forward * inputY); 
+            cam.transform.localEulerAngles -= new Vector3(0,0,wallRunRotation);
         }
 
         if(Input.GetKeyDown(jumpKey)){
-            Jump();
+            WallJump(rightWall);
         }
+
         cc.Move(wallRunMovement * wallRunSpeed * Time.deltaTime);
     }
 

@@ -175,9 +175,11 @@ MonoBehaviour:
   jumpKey: 32
   crouchKey: 99
   movementSpeed: 5
-  runSpeed: 10
   crouchSpeed: 2.5
-  wallRunSpeed: 6
+  wallRunSpeed: 12
+  runSpeed: 10
+  runFOV: 0
+  runFOVSpeed: 0
   jumpHeight: 3
   enableAdjustableJump: 1
   adjustableJumpTime: 0.3
@@ -185,6 +187,11 @@ MonoBehaviour:
   allowDoubleJump: 1
   allowedExtraJumps: 1
   onlyAllowOnDecline: 1
+  allowJetPack: 1
+  thrustForce: 2
+  jetPackTime: 0.6
+  jetPackFuel: 100
+  jetPackFuelUsage: 10
   climbSpeed: 3
   isClimbing: 0
   crouchMultiplier: 0.5
@@ -197,7 +204,7 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  isGrounded: 0
+  isGrounded: 1
   whatIsRoof:
     serializedVersion: 2
     m_Bits: 1
@@ -211,14 +218,18 @@ MonoBehaviour:
   climbableCheck: {fileID: 7336790133609876077}
   isFacingClimbableWall: 0
   allowWallRun: 1
-  wallRunRotation: 45
+  wallRunRotation: 20
+  wallRunFOV: 70
+  wallRunFOVSpeed: 0
+  gravityScaleWallRunning: 0
   whatIsWallRun:
     serializedVersion: 2
     m_Bits: 512
   wallRunRightCheck: {fileID: 5792965529772161375}
   wallRunLeftCheck: {fileID: 7985464136841144329}
-  wallRunCheckRadius: 0.4
+  wallRunCheckRadius: 0.2
   isWallRunning: 0
+  FOVBackToNormalSpeed: 0
 --- !u!114 &7336790133378781221
 MonoBehaviour:
   m_ObjectHideFlags: 0
