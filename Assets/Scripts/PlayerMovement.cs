@@ -318,6 +318,10 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
+    public void LaunchIntoAir(float force){
+        velocity.y = Mathf.Sqrt(force * -2 * gravityConst * gravityScale);
+    }
+
     void Climb(){
         Vector3 climbMovement = (transform.right * inputX) + (transform.up * inputY); 
         cc.Move(climbMovement * climbSpeed * Time.deltaTime);

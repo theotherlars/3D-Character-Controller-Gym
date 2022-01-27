@@ -8,6 +8,7 @@ public class ProjectileShoot : MonoBehaviour{
     [SerializeField]GameObject projectile;
     [SerializeField]Transform gunPoint;
     [SerializeField]float shootForce;
+    [SerializeField]bool shouldDestoryAfterTime;
     [SerializeField]float projectileTime;
     [SerializeField]float range;
 
@@ -19,7 +20,9 @@ public class ProjectileShoot : MonoBehaviour{
 
     public void Shoot(){
         GameObject bullet = Instantiate(projectile,gunPoint.position,Quaternion.LookRotation(gunPoint.forward, gunPoint.up));
-        bullet.GetComponent<Rigidbody>().AddForce(gunPoint.forward * shootForce);
-        Destroy(bullet,projectileTime);
+        // bullet.GetComponent<Rigidbody>().AddForce(gunPoint.forward * shootForce);
+        if(shouldDestoryAfterTime){
+            Destroy(bullet,projectileTime);
+        }
     }
 }

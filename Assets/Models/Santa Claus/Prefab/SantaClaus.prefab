@@ -2715,9 +2715,9 @@ GameObject:
   - component: {fileID: -402264419416216859}
   - component: {fileID: 53624993627323789}
   - component: {fileID: 2720219988198701035}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SantaClaus
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
