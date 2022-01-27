@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FPSCamera : MonoBehaviour
-{  
+public class FPSCamera : MonoBehaviour{  
+
     public float mouseSensitivity;
     [Tooltip("Default: -75")][Range(-90,90)]
     public float maxLookUp = -75;
@@ -14,6 +14,7 @@ public class FPSCamera : MonoBehaviour
     float xRotation;
 
     void Start(){
+        Application.targetFrameRate = 60;
         Cursor.lockState = CursorLockMode.Locked;
         cam = Camera.main;
     }
