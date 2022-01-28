@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 812917141380185145}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -1.5, z: 0}
+  m_LocalPosition: {x: -0.5, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7336790134487695963}
@@ -178,9 +178,9 @@ MonoBehaviour:
   crouchSpeed: 2.5
   wallRunSpeed: 12
   runSpeed: 10
-  runFOV: 0
-  runFOVSpeed: 0
-  jumpHeight: 3
+  runFOV: 70
+  runFOVSpeed: 0.2
+  jumpHeight: 2
   enableAdjustableJump: 1
   adjustableJumpTime: 0.3
   adjustableJumpMultiplier: 0.5
@@ -188,7 +188,7 @@ MonoBehaviour:
   allowedExtraJumps: 1
   onlyAllowOnDecline: 1
   allowJetPack: 1
-  thrustForce: 2
+  thrustForce: 1
   jetPackTime: 0.6
   jetPackFuel: 100
   jetPackFuelUsage: 10
@@ -197,7 +197,7 @@ MonoBehaviour:
   crouchMultiplier: 0.5
   deCrouchMultiplier: 2
   isCrouching: 0
-  gravityScale: 4
+  gravityScale: 3
   velocity: {x: 0, y: -2, z: 0}
   groundCheck: {fileID: 7336790133570157611}
   groundCheckRadius: 0.1
@@ -220,9 +220,9 @@ MonoBehaviour:
   allowWallRun: 1
   wallRunRotation: 20
   wallRunFOV: 70
-  wallRunFOVSpeed: 0
-  gravityScaleWallRunning: 0
-  wallJumpForce: 0
+  wallRunFOVSpeed: 0.2
+  gravityScaleWallRunning: 0.9
+  wallJumpForce: 10
   whatIsWallRun:
     serializedVersion: 2
     m_Bits: 512
@@ -230,7 +230,7 @@ MonoBehaviour:
   wallRunLeftCheck: {fileID: 7985464136841144329}
   wallRunCheckRadius: 0.2
   isWallRunning: 0
-  FOVBackToNormalSpeed: 0
+  FOVBackToNormalSpeed: 0.5
 --- !u!114 &7336790133378781221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -682,7 +682,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7443159983711435582}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: -1.5, z: 0}
+  m_LocalPosition: {x: 0.5, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7336790134487695963}
@@ -699,13 +699,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gun_Raycast
       objectReference: {fileID: 0}
+    - target: {fileID: 2942280423441285068, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2942280423441285070, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
       propertyPath: fireRate
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2942280423441285070, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
-      propertyPath: whatToShoot.m_Bits
-      value: 959
+      propertyPath: magazineSize
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2942280423441285071, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
       propertyPath: m_RootOrder
@@ -750,6 +754,10 @@ PrefabInstance:
     - target: {fileID: 2942280423441285071, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3014453523249762794, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 680cd7dc1a4f19b40bd309776496698e, type: 3}
@@ -831,21 +839,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: RocketLauncher
       objectReference: {fileID: 0}
+    - target: {fileID: 3005699701054425725, guid: 228c750f948dded47ad155ff6f610d9f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6009344377463478955, guid: 228c750f948dded47ad155ff6f610d9f, type: 3}
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6009344377463478955, guid: 228c750f948dded47ad155ff6f610d9f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.307
+      value: 0.408
       objectReference: {fileID: 0}
     - target: {fileID: 6009344377463478955, guid: 228c750f948dded47ad155ff6f610d9f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.316
+      value: -0.38
       objectReference: {fileID: 0}
     - target: {fileID: 6009344377463478955, guid: 228c750f948dded47ad155ff6f610d9f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.293
+      value: 0.453
       objectReference: {fileID: 0}
     - target: {fileID: 6009344377463478955, guid: 228c750f948dded47ad155ff6f610d9f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1105,13 +1117,29 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7950731736053283439, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7950731736053283439, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8091128801045678336, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8438140315780036376, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}
       propertyPath: shootForce
-      value: 5000
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 8438140315780036376, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}
       propertyPath: projectileTime
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8837619691909462819, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aaefbe886e90ffa4ab34052858ffe3a1, type: 3}

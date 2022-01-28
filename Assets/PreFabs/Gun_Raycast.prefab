@@ -231,7 +231,7 @@ MonoBehaviour:
   gunpos: {fileID: 2942280423441285071}
   whatToShoot:
     serializedVersion: 2
-    m_Bits: 191
+    m_Bits: 1983
   hitForce: 200
   magazineSize: 0
   currentMagazine: 0
