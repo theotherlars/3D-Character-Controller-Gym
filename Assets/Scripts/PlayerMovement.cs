@@ -209,6 +209,8 @@ public class PlayerMovement : MonoBehaviour {
     void HandleGravity(){
         if(isGrounded && velocity.y < 0.0f){
             velocity.y = -2;
+            velocity.x = 0;
+            velocity.z = 0;
         }
         else if(isWallRunning){
             velocity.y += gravityConst * gravityScaleWallRunning * Time.deltaTime;
@@ -320,6 +322,10 @@ public class PlayerMovement : MonoBehaviour {
 
     public void LaunchIntoAir(float force){
         velocity.y = Mathf.Sqrt(force * -2 * gravityConst * gravityScale);
+    }
+
+    public void Explosion(Vector3 direction, float force){
+        velocity = direction * force;
     }
 
     void Climb(){

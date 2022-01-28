@@ -14,7 +14,11 @@ public class RocketScript : MonoBehaviour{
     [SerializeField]LayerMask explosionLayers;
     [SerializeField]float travelSpeed;
     ParticleSystem trail;
+    Vector3 startPos;
 
+    private void Awake() {
+        startPos = transform.position;
+    }
     private void Start() {
         trail = Instantiate(rocketTrailParticles,trailPos.position,Quaternion.LookRotation(transform.forward,transform.up));
         trail.transform.parent = transform;
@@ -28,9 +32,10 @@ public class RocketScript : MonoBehaviour{
         Destroy(trail);
         if(other.gameObject.CompareTag("Player")){
             if(other.gameObject.TryGetComponent(out PlayerMovement pm)){
-                if(pm.isGrounded){
-                    pm.LaunchIntoAir(explosionForce);
-                }
+                Vector3 dir = (startPos - transform.position).normalized;
+                pm.Explosion(dir,explosionForce);
+                // pm.LaunchIntoAir(explosionForce);
+                
             }
         }
         else{
